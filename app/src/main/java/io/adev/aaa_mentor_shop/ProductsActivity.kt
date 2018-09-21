@@ -8,7 +8,12 @@ import android.support.v7.widget.RecyclerView
 import android.view.Gravity
 import android.view.ViewGroup
 import android.widget.FrameLayout
+import android.widget.ImageView
+import android.widget.LinearLayout
 import android.widget.TextView
+import com.squareup.picasso.Picasso
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.json.JSON
 import org.jetbrains.anko.*
 import org.jetbrains.anko.recyclerview.v7.recyclerView
 
@@ -16,20 +21,49 @@ class ProductsActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        val json = """
+{
+    "products": [
+        {
+            "title": "Помидор",
+            "price": 42.99,
+            "imageUrl": "https://greenmylife-wpengine.netdna-ssl.com/wp-content/uploads/2014/06/HighYield-Tomato.jpg"
+        },
+        {
+            "title": "Огурец",
+            "price": 56.99,
+            "imageUrl": "http://demandware.edgesuite.net/sits_pod32/dw/image/v2/BBBW_PRD/on/demandware.static/-/Sites-jss-master/default/dwdc19b9f9/images/products/vegetables/0047g_01_katrina.jpg?sw=387&cx=216&cy=0&cw=1196&ch=1196"
+        },
+        {
+            "title": "Картошка",
+            "price": 21.99,
+            "imageUrl": "https://cdn.mr-fothergills.co.uk/product-images/op/z/POT-270z.jpg"
+        }
+    ]
+}
+        """
 
-        val tomato = Product(title = "Помидор", price = 42.99)
-        val cucumber = Product(title = "Огурец", price = 56.99)
-        val potato = Product(title = "Картошка", price = 21.99)
-
-        val vegetables = listOf(tomato, cucumber, potato)
+        val vegetables: ProductsList = JSON.parse(json)
 
         recyclerView {
             layoutManager = LinearLayoutManager(this@ProductsActivity)
-            adapter = ProductsAdapter(products = vegetables, context = this@ProductsActivity)
+            adapter = ProductsAdapter(products = vegetables.products, context = this@ProductsActivity)
         }
     }
 
 }
+
+@Serializable
+class Product(
+    val title: String,
+    val price: Double,
+    val imageUrl: String
+)
+
+@Serializable
+class ProductsList(
+    val products: List<Product>
+)
 
 class ProductsAdapter(
     val products: List<Product>,
@@ -57,6 +91,9 @@ class ProductsAdapter(
 
         // toString() - функция, превращающая дробное число в текст
         holder.view.priceView.text = product.price.toString()
+
+        // загрузка картинки
+        Picasso.get().load(product.imageUrl).into(holder.view.pictureView)
     }
 }
 
@@ -65,6 +102,8 @@ class ProductsAdapter(
 class ProductView(context: Context) : FrameLayout(context) {
     lateinit var titleView: TextView // lateinit означает, что переменной
     lateinit var priceView: TextView // не нужно задавать начальное значение
+    lateinit var pictureView: ImageView
+
     init { // код, который выполнится при создании каждого объекта ProductView
 
         // Задаём параметры макета для ProductView.
@@ -72,20 +111,26 @@ class ProductView(context: Context) : FrameLayout(context) {
         layoutParams = LayoutParams(matchParent, wrapContent)
 
         // Описание интерфейса ячейки
-        frameLayout {
-            titleView = textView {
-
-            }
-            priceView = textView {
+        linearLayout {
+            orientation = LinearLayout.VERTICAL
+            pictureView = imageView {
 
             }.lparams {
-                gravity = Gravity.END
+                width = matchParent
+                height = dip(200)
+            }
+            frameLayout {
+                titleView = textView {
+
+                }
+                priceView = textView {
+
+                }.lparams {
+                    gravity = Gravity.END
+                }
             }
         }
     }
 }
-
-
-class Product(val title: String, val price: Double)
 
 class ProductViewHolder(val view: ProductView) : RecyclerView.ViewHolder(view)

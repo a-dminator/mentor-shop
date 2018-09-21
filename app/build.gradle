@@ -4,6 +4,8 @@ apply plugin: 'kotlin-android'
 
 apply plugin: 'kotlin-android-extensions'
 
+apply plugin: 'kotlinx-serialization'
+
 android {
     compileSdkVersion 28
     defaultConfig {
@@ -35,7 +37,8 @@ dependencies {
     implementation "org.jetbrains.anko:anko:0.10.5"
     implementation "org.jetbrains.anko:anko-recyclerview-v7:0.10.5"
 
-
+    implementation "org.jetbrains.kotlinx:kotlinx-serialization-runtime:0.6.2"
+    implementation 'com.squareup.picasso:picasso:2.71828'
 
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'com.android.support.test:runner:1.0.2'
