@@ -1,9 +1,9 @@
-package io.adev.aaa_mentor_shop
+package io.adev.mentor_shop
 
 import android.content.Context
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
-import android.support.v7.widget.LinearLayoutManager
+import android.support.v7.widget.GridLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.view.Gravity
 import android.view.ViewGroup
@@ -12,42 +12,50 @@ import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
 import com.squareup.picasso.Picasso
+import kotlinx.coroutines.experimental.*
+import kotlinx.coroutines.experimental.android.Main
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.JSON
+import okhttp3.OkHttpClient
+import okhttp3.Request
 import org.jetbrains.anko.*
+import org.jetbrains.anko.cardview.v7.cardView
 import org.jetbrains.anko.recyclerview.v7.recyclerView
 
 class ProductsActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        val json = """
-{
-    "products": [
-        {
-            "title": "Помидор",
-            "price": 42.99,
-            "imageUrl": "https://greenmylife-wpengine.netdna-ssl.com/wp-content/uploads/2014/06/HighYield-Tomato.jpg"
-        },
-        {
-            "title": "Огурец",
-            "price": 56.99,
-            "imageUrl": "http://demandware.edgesuite.net/sits_pod32/dw/image/v2/BBBW_PRD/on/demandware.static/-/Sites-jss-master/default/dwdc19b9f9/images/products/vegetables/0047g_01_katrina.jpg?sw=387&cx=216&cy=0&cw=1196&ch=1196"
-        },
-        {
-            "title": "Картошка",
-            "price": 21.99,
-            "imageUrl": "https://cdn.mr-fothergills.co.uk/product-images/op/z/POT-270z.jpg"
-        }
-    ]
-}
-        """
 
-        val vegetables: ProductsList = JSON.parse(json)
+        GlobalScope.launch(Dispatchers.Main) {
 
-        recyclerView {
-            layoutManager = LinearLayoutManager(this@ProductsActivity)
-            adapter = ProductsAdapter(products = vegetables.products, context = this@ProductsActivity)
+            frameLayout {
+                progressBar {
+
+                }.lparams {
+                    gravity = Gravity.CENTER
+                }
+            }
+
+            val request = Request.Builder()
+                .url("https://api.myjson.com/bins/iglkc")
+                .build()
+
+            val client = OkHttpClient()
+
+            val response = async(Dispatchers.IO) {
+                client.newCall(request)
+                    .execute()
+            }.await()
+
+            val json = response.body()!!.string()
+
+            val vegetables: ProductsList = JSON.parse(json)
+
+            recyclerView {
+                layoutManager = GridLayoutManager(this@ProductsActivity, 2)
+                adapter = ProductsAdapter(products = vegetables.products, context = this@ProductsActivity)
+            }
         }
     }
 
@@ -111,26 +119,55 @@ class ProductView(context: Context) : FrameLayout(context) {
         layoutParams = LayoutParams(matchParent, wrapContent)
 
         // Описание интерфейса ячейки
-        linearLayout {
-            orientation = LinearLayout.VERTICAL
-            pictureView = imageView {
+        frameLayout {
+            cardView {
+                radius = 30f
+                elevation = 7.0f
+                linearLayout {
+                    orientation = LinearLayout.VERTICAL
+                    pictureView = imageView {
 
-            }.lparams {
-                width = matchParent
-                height = dip(200)
-            }
-            frameLayout {
-                titleView = textView {
+                    }.lparams {
+                        width = matchParent
+                        height = dip(200)
+                    }
+                    verticalLayout {
+                        titleView = textView {
 
-                }
-                priceView = textView {
+                        }.lparams {
+                            gravity = Gravity.CENTER
+                        }
+                        priceView = textView {
 
+                        }.lparams {
+                            gravity = Gravity.CENTER
+                        }
+                    }
                 }.lparams {
-                    gravity = Gravity.END
+                    width = matchParent
+                    height = wrapContent
                 }
+            }.lparams {
+                margin = dip(15)
+                width = matchParent
+                height = wrapContent
             }
         }
     }
 }
 
 class ProductViewHolder(val view: ProductView) : RecyclerView.ViewHolder(view)
+
+
+
+
+
+
+
+
+
+
+
+
+
+

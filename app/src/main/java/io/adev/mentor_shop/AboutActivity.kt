@@ -1,4 +1,4 @@
-package io.adev.aaa_mentor_shop
+package io.adev.mentor_shop
 
 import android.graphics.Color
 import android.support.v7.app.AppCompatActivity

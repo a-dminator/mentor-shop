@@ -1,4 +1,4 @@
-package io.adev.aaa_mentor_shop
+package io.adev.mentor_shop
 
 import android.support.test.InstrumentationRegistry
 import android.support.test.runner.AndroidJUnit4
