@@ -16,13 +16,16 @@ import kotlinx.coroutines.experimental.*
 import kotlinx.coroutines.experimental.android.Main
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.JSON
-import okhttp3.OkHttpClient
-import okhttp3.Request
 import org.jetbrains.anko.*
 import org.jetbrains.anko.cardview.v7.cardView
 import org.jetbrains.anko.recyclerview.v7.recyclerView
+import org.jetbrains.anko.sdk25.coroutines.onClick
+import org.kodein.di.direct
+import org.kodein.di.generic.instance
 
 class ProductsActivity : AppCompatActivity() {
+
+    val requestMaker: RequestMaker = di.direct.instance()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -37,18 +40,9 @@ class ProductsActivity : AppCompatActivity() {
                 }
             }
 
-            val request = Request.Builder()
-                .url("https://api.myjson.com/bins/iglkc")
-                .build()
-
-            val client = OkHttpClient()
-
-            val response = async(Dispatchers.IO) {
-                client.newCall(request)
-                    .execute()
+            val json = async(Dispatchers.IO) {
+                requestMaker.make("https://api.myjson.com/bins/iglkc")
             }.await()
-
-            val json = response.body()!!.string()
 
             val vegetables: ProductsList = JSON.parse(json)
 
@@ -65,6 +59,7 @@ class ProductsActivity : AppCompatActivity() {
 class Product(
     val title: String,
     val price: Double,
+    val description: String,
     val imageUrl: String
 )
 
@@ -99,6 +94,13 @@ class ProductsAdapter(
 
         // toString() - функция, превращающая дробное число в текст
         holder.view.priceView.text = product.price.toString()
+
+        holder.view.onClick {
+            val json = JSON.stringify(product)
+            context.startActivity<ProductDetailsActivity>(
+                "product" to json
+            )
+        }
 
         // загрузка картинки
         Picasso.get().load(product.imageUrl).into(holder.view.pictureView)
