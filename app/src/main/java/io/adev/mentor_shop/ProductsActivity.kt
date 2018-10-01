@@ -18,6 +18,7 @@ import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.JSON
 import org.jetbrains.anko.*
 import org.jetbrains.anko.cardview.v7.cardView
+import org.jetbrains.anko.custom.customView
 import org.jetbrains.anko.recyclerview.v7.recyclerView
 import org.jetbrains.anko.sdk25.coroutines.onClick
 import org.kodein.di.direct
@@ -40,15 +41,23 @@ class ProductsActivity : AppCompatActivity() {
                 }
             }
 
+            val categoryJson = intent.getStringExtra("category")
+            val category: Category = JSON.parse(categoryJson)
+
             val json = async(Dispatchers.IO) {
-                requestMaker.make("https://api.myjson.com/bins/iglkc")
+                requestMaker.make(category.url)
             }.await()
 
             val vegetables: ProductsList = JSON.parse(json)
 
-            recyclerView {
-                layoutManager = GridLayoutManager(this@ProductsActivity, 2)
-                adapter = ProductsAdapter(products = vegetables.products, context = this@ProductsActivity)
+            verticalLayout {
+                customView<HeaderView> {
+                    titleView.text = category.title
+                }
+                recyclerView {
+                    layoutManager = GridLayoutManager(this@ProductsActivity, 2)
+                    adapter = ProductsAdapter(products = vegetables.products, context = this@ProductsActivity)
+                }
             }
         }
     }
@@ -59,7 +68,6 @@ class ProductsActivity : AppCompatActivity() {
 class Product(
     val title: String,
     val price: Double,
-    val description: String,
     val imageUrl: String
 )
 
