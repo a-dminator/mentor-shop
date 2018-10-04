@@ -1,17 +1,22 @@
 package io.adev.mentor_shop
 
+import android.graphics.Color
 import android.graphics.Paint
 import android.graphics.Typeface
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
+import android.support.v7.widget.Toolbar
 import android.util.Log
 import kotlinx.coroutines.experimental.*
 import kotlinx.coroutines.experimental.android.Main
 import org.jetbrains.anko.*
+import org.jetbrains.anko.appcompat.v7.toolbar
 import org.jetbrains.anko.custom.customView
 import org.jetbrains.anko.sdk25.coroutines.onClick
 
 class MainActivity : AppCompatActivity() {
+
+    lateinit var toolbar: Toolbar
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -31,8 +36,15 @@ class MainActivity : AppCompatActivity() {
 
             verticalLayout {
 
-                customView<HeaderView> {
-                    titleView.text = "Главная"
+                toolbar = toolbar { // вёрстка замены ActionBar
+                    title = "no title"
+                    backgroundColor = Color.YELLOW
+                    button {
+                        text = "123"
+                    }
+                }.lparams {
+                    width = matchParent
+                    height = dip(56)
                 }
 
                 button {
@@ -50,5 +62,7 @@ class MainActivity : AppCompatActivity() {
                 }
             }
         }
+
+        setSupportActionBar(toolbar) // замена ActionBar
     }
 }
