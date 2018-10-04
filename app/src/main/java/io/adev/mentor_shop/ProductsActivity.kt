@@ -1,5 +1,7 @@
 package io.adev.mentor_shop
 
+import android.arch.persistence.room.*
+import android.arch.persistence.room.Database
 import android.content.Context
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
@@ -23,6 +25,7 @@ import org.jetbrains.anko.recyclerview.v7.recyclerView
 import org.jetbrains.anko.sdk25.coroutines.onClick
 import org.kodein.di.direct
 import org.kodein.di.generic.instance
+
 
 class ProductsActivity : AppCompatActivity() {
 
@@ -50,6 +53,10 @@ class ProductsActivity : AppCompatActivity() {
 
             val vegetables: ProductsList = JSON.parse(json)
 
+            async(Dispatchers.IO) {
+                db.productsDao().add(vegetables.products[0])
+            }.await()
+
             verticalLayout {
                 customView<HeaderView> {
                     titleView.text = category.title
@@ -65,11 +72,26 @@ class ProductsActivity : AppCompatActivity() {
 }
 
 @Serializable
+@Entity(tableName = "products")
 class Product(
+    @PrimaryKey val id: Int,
     val title: String,
     val price: Double,
     val imageUrl: String
 )
+
+@Dao
+interface ProductsDao {
+
+    @Insert
+    fun add(product: Product)
+
+}
+
+@Database(entities = [Product::class], version = 1)
+abstract class AppDatabase : RoomDatabase() {
+    abstract fun productsDao(): ProductsDao
+}
 
 @Serializable
 class ProductsList(

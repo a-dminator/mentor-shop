@@ -4,6 +4,9 @@ import android.graphics.Paint
 import android.graphics.Typeface
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
+import android.util.Log
+import kotlinx.coroutines.experimental.*
+import kotlinx.coroutines.experimental.android.Main
 import org.jetbrains.anko.*
 import org.jetbrains.anko.custom.customView
 import org.jetbrains.anko.sdk25.coroutines.onClick
