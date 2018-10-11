@@ -1,4 +1,4 @@
-package io.adev.mentor_shop
+package io.adev.mentor_shop.data
 
 import okhttp3.OkHttpClient
 import okhttp3.Request
@@ -11,7 +11,7 @@ interface RequestMaker {
 
 class OkHttpRequestMaker : RequestMaker {
 
-    val client = OkHttpClient()
+    private val client = OkHttpClient()
 
     override fun make(url: String) = run {
 

@@ -1,4 +1,4 @@
-package io.adev.mentor_shop
+package io.adev.mentor_shop.data
 
 import com.chibatching.kotpref.KotprefModel
 

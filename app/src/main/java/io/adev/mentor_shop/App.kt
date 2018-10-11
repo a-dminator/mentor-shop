@@ -3,8 +3,9 @@ package io.adev.mentor_shop
 import android.app.Application
 import android.arch.persistence.room.Room
 import com.chibatching.kotpref.Kotpref
+import io.adev.mentor_shop.data.ShopDatabase
 
-lateinit var db: AppDatabase
+lateinit var db: ShopDatabase
 
 class App : Application() {
 
@@ -13,8 +14,9 @@ class App : Application() {
         Kotpref.init(this)
 
         db = Room.databaseBuilder(
-            applicationContext,
-            AppDatabase::class.java, "database"
+            this,
+            ShopDatabase::class.java,
+            "shop"
         ).build()
     }
 

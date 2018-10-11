@@ -1,4 +1,4 @@
-package io.adev.mentor_shop
+package io.adev.mentor_shop.view
 
 import android.content.Context
 import android.graphics.Typeface

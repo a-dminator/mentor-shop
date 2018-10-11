@@ -1,7 +1,5 @@
-package io.adev.mentor_shop
+package io.adev.mentor_shop.view
 
-import android.arch.persistence.room.*
-import android.arch.persistence.room.Database
 import android.content.Context
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
@@ -14,18 +12,24 @@ import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
 import com.squareup.picasso.Picasso
-import kotlinx.coroutines.experimental.*
-import kotlinx.coroutines.experimental.android.Main
+import io.adev.mentor_shop.data.RequestMaker
+import io.adev.mentor_shop.di
+import io.adev.mentor_shop.entities.Category
+import io.adev.mentor_shop.entities.Product
+import io.adev.mentor_shop.entities.ProductsList
+import kotlinx.coroutines.experimental.Dispatchers
+import kotlinx.coroutines.experimental.GlobalScope
+import kotlinx.coroutines.experimental.async
+import kotlinx.coroutines.experimental.launch
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.JSON
 import org.jetbrains.anko.*
 import org.jetbrains.anko.cardview.v7.cardView
 import org.jetbrains.anko.custom.customView
 import org.jetbrains.anko.recyclerview.v7.recyclerView
-import org.jetbrains.anko.sdk25.coroutines.onClick
+import org.jetbrains.anko.sdk27.coroutines.onClick
 import org.kodein.di.direct
 import org.kodein.di.generic.instance
-
 
 class ProductsActivity : AppCompatActivity() {
 
@@ -53,10 +57,6 @@ class ProductsActivity : AppCompatActivity() {
 
             val vegetables: ProductsList = JSON.parse(json)
 
-            async(Dispatchers.IO) {
-                db.productsDao().add(vegetables.products[0])
-            }.await()
-
             verticalLayout {
                 customView<HeaderView> {
                     titleView.text = category.title
@@ -70,33 +70,6 @@ class ProductsActivity : AppCompatActivity() {
     }
 
 }
-
-@Serializable
-@Entity(tableName = "products")
-class Product(
-    @PrimaryKey val id: Int,
-    val title: String,
-    val price: Double,
-    val imageUrl: String
-)
-
-@Dao
-interface ProductsDao {
-
-    @Insert
-    fun add(product: Product)
-
-}
-
-@Database(entities = [Product::class], version = 1)
-abstract class AppDatabase : RoomDatabase() {
-    abstract fun productsDao(): ProductsDao
-}
-
-@Serializable
-class ProductsList(
-    val products: List<Product>
-)
 
 class ProductsAdapter(
     val products: List<Product>,
