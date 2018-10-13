@@ -9,5 +9,7 @@ import kotlinx.serialization.Serializable
 data class Category(
     @PrimaryKey val id: Int,
     val title: String,
-    val url: String
+    val url: String,
+    val rating: Double,
+    val productsCount: Int
 )

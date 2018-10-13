@@ -1,12 +1,16 @@
 package io.adev.mentor_shop.view
 
+import android.content.res.Configuration
 import android.graphics.Color
 import android.os.Bundle
+import android.support.v7.app.ActionBarDrawerToggle
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.LinearLayoutManager
+import android.support.v7.widget.Toolbar
 import android.view.Gravity
-import android.widget.Toolbar
+import android.view.View
 import org.jetbrains.anko.*
+import org.jetbrains.anko.appcompat.v7.toolbar
 import org.jetbrains.anko.design.navigationView
 import org.jetbrains.anko.recyclerview.v7.recyclerView
 import org.jetbrains.anko.sdk27.coroutines.onClick
@@ -14,7 +18,8 @@ import org.jetbrains.anko.support.v4.drawerLayout
 
 class MainActivity : AppCompatActivity() {
 
-    lateinit var toolbar: Toolbar
+    private lateinit var drawerToggle: ActionBarDrawerToggle
+    private lateinit var toolbar: Toolbar
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -61,7 +66,7 @@ class MainActivity : AppCompatActivity() {
 //            }
 //        }
 
-        drawerLayout {
+        val drawerLayout = drawerLayout {
             verticalLayout {
                 toolbar = toolbar {
 
@@ -87,7 +92,33 @@ class MainActivity : AppCompatActivity() {
             openDrawer(Gravity.START)
         }
 
-        setActionBar(toolbar) // замена ActionBar
-        actionBar!!.setHomeButtonEnabled(true) // TODO доделать
+        setSupportActionBar(toolbar) // замена ActionBar
+
+        drawerToggle = object : ActionBarDrawerToggle(this, drawerLayout, toolbar, 0, 0) {
+
+            override fun onDrawerClosed(view: View) {
+                supportInvalidateOptionsMenu()
+                //drawerOpened = false;
+            }
+
+            override fun onDrawerOpened(drawerView: View) {
+                supportInvalidateOptionsMenu()
+                //drawerOpened = true;
+            }
+        }
+        drawerToggle.isDrawerIndicatorEnabled = true
+        drawerLayout.setDrawerListener(drawerToggle)
+        drawerToggle.syncState()
     }
+
+    override fun onPostCreate(savedInstanceState: Bundle?) {
+        super.onPostCreate(savedInstanceState)
+        drawerToggle.syncState()
+    }
+
+    override fun onConfigurationChanged(newConfig: Configuration) {
+        super.onConfigurationChanged(newConfig)
+        drawerToggle.onConfigurationChanged(newConfig)
+    }
+
 }
